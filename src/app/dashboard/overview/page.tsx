@@ -29,6 +29,7 @@ import { StatusBadge } from "@/components/dashboard/attendance-status-badge";
 import { Building2, MapPin } from "lucide-react";
 import { useLocations, useOverview, usePresence } from "@/hooks/use-queries";
 import { usePresenceStore } from "@/store/presence-store";
+import { useAuthStore } from "@/store/auth-store";
 import { cn, formatTime, formatDuration, pct } from "@/lib/utils";
 import { LEAVE_TYPE_LABELS } from "@/constants";
 
@@ -43,6 +44,7 @@ const ACTIVITY_ICONS = {
 } as const;
 
 export default function OverviewPage() {
+  const userName = useAuthStore((s) => s.session?.user.name ?? "there");
   const { data, isLoading, isError, refetch } = useOverview();
   const { data: locations } = useLocations();
   const { data: presenceRows } = usePresence("all");
@@ -135,7 +137,7 @@ export default function OverviewPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={`Good day, ${"Maya"}`}
+        title={`Good day, ${userName.split(" ")[0]}`}
         description={`Here's what's happening across your workforce — ${new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}.`}
         actions={
           <>

@@ -1,4 +1,6 @@
 import { db, isoDay } from "./db";
+import { accounts } from "./accounts";
+import { ApiError } from "./api-error";
 import {
   buildDashboardStats,
   buildCurrentlyClockedIn,
@@ -49,14 +51,60 @@ export async function mockRequest<T>(
 
   // ── Auth ─────────────────────────────────────────────────────────────
   if (path === "/auth/login" && method === "POST") {
-    const { email } = (body ?? {}) as { email?: string };
+    const { email, password } = (body ?? {}) as { email?: string; password?: string };
+    const normalized = (email ?? "").trim().toLowerCase();
+    const account = accounts.findByEmail(normalized);
+
+    // Registered accounts must present the password they signed up with.
+    if (account && account.password !== password) {
+      throw new ApiError("Incorrect password for this account.", 401);
+    }
+    // Unknown account or the built-in demo manager — sign straight in.
+    const name = account ? account.name : "Maya Okafor";
+    const role = account ? account.role : "manager";
+    const department = account ? account.department : "Operations";
+
     return {
       user: {
-        id: "usr_001",
-        name: "Maya Okafor",
-        email: email ?? "manager@shifttrack.io",
-        role: "manager",
-        department: "Operations",
+        id: account ? account.id : "usr_001",
+        name,
+        email: normalized || "manager@shifttrack.io",
+        role,
+        department,
+      },
+      accessToken: `mock.jwt.${Math.random().toString(36).slice(2)}`,
+      expiresAt: Date.now() + 1000 * 60 * 60 * 24 * 7,
+    } as T;
+  }
+
+  if (path === "/auth/register" && method === "POST") {
+    const { name, email, password, department } = (body ?? {}) as {
+      name?: string;
+      email?: string;
+      password?: string;
+      department?: string;
+    };
+    const normalized = (email ?? "").trim().toLowerCase();
+
+    if (!name || !normalized || !password) {
+      throw new ApiError("Name, email and password are required.", 400);
+    }
+    if (accounts.findByEmail(normalized)) {
+      throw new ApiError(
+        "An account with this email already exists. Try signing in instead.",
+        409,
+      );
+    }
+
+    const account = accounts.create({ name, email: normalized, password, department });
+
+    return {
+      user: {
+        id: account.id,
+        name: account.name,
+        email: account.email,
+        role: account.role,
+        department: account.department,
       },
       accessToken: `mock.jwt.${Math.random().toString(36).slice(2)}`,
       expiresAt: Date.now() + 1000 * 60 * 60 * 24 * 7,

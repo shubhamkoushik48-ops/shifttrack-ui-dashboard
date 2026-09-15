@@ -27,6 +27,15 @@ export const authService = {
     const res = await http.post<AuthSession>("/auth/login", { email, password });
     return res.data;
   },
+  async register(input: {
+    name: string;
+    email: string;
+    password: string;
+    department?: string;
+  }): Promise<AuthSession> {
+    const res = await http.post<AuthSession>("/auth/register", input);
+    return res.data;
+  },
   async logout(): Promise<void> {
     await http.post("/auth/logout");
   },

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -240,7 +241,18 @@ export default function LoginPage() {
             </Button>
 
             <p className="text-center text-xs text-muted-foreground">
-              Demo hint: any email + password of 8+ characters will sign you in.
+              Demo hint: <span className="font-medium text-foreground">manager@shifttrack.io</span> +
+              <span className="font-medium text-foreground"> shifttrack2026</span> — or use any email + 8-char password.
+            </p>
+
+            <p className="text-center text-sm text-muted-foreground">
+              New to ShiftTrack?{" "}
+              <Link
+                href="/register"
+                className="font-semibold text-primary hover:underline"
+              >
+                Create an account
+              </Link>
             </p>
           </form>
         </motion.div>

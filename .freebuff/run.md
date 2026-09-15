@@ -6,10 +6,16 @@
    ```
    npm install --no-audit --no-fund
    ```
-2. Environment: the app runs fully offline on a deterministic in-repo mock backend.
-   No `.env.local` is required. If real backend wiring is wanted later, copy
-   `.env.example` to `.env.local` and fill `NEXT_PUBLIC_API_URL` /
-   `NEXT_PUBLIC_WS_URL` / `NEXT_PUBLIC_ENABLE_WS=true`.
+2. Environment: a `.env.local` exists in the repo root (added by the user,
+   commit d0b3df7) pointing at a real backend:
+   `NEXT_PUBLIC_API_URL=http://localhost:5000/api`, `NEXT_PUBLIC_WS_URL=http://localhost:5000`,
+   `NEXT_PUBLIC_ENABLE_WS=false`. The real backend is tried first for every
+   request; when it is NOT running (or returns 404 for an endpoint it has not
+   implemented), `src/lib/api-client.ts` transparently falls back to the
+   built-in mock router (`src/mock/api.ts`), so the preview works with or
+   without the backend. The console logs `[api] backend unavailable — mock
+   served …` lines when the fallback engages. Realtime uses the built-in
+   simulator while `NEXT_PUBLIC_ENABLE_WS=false`.
 3. No database or build artifacts are needed before `npm run dev` — Next.js
    compiles on first request.
 
@@ -40,6 +46,13 @@
   start it again. Avoid production builds while the dev server is live.
 - **404 for a newly added route** — the dev server was started before the
   route file existed and serves a stale manifest. Restart the server.
+- **Console floods with `net::ERR_CONNECTION_REFUSED` to `localhost:5000`** —
+  the user's real backend (see `.env.local`) is not running. Not fatal: the
+  mock fallback serves every request and the app works normally. Start the
+  real backend on port 5000 to exercise the real API instead.
+- **`Start-Process` timeout caveat** — the pid it prints is `npm.cmd`'s
+  wrapper, not node. The LISTENING socket's pid (check `netstat -ano`) is the
+  real Next.js pid to use with `register_preview`.
 - **PowerShell `Start-Process` appears to hang** — it does not exit while
   `npm.cmd` runs; the server still starts. Wrap the launch in a backgrounded
   shell command and then verify with `netstat -ano | grep :3100`.

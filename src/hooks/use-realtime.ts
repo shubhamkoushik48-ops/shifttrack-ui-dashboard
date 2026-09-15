@@ -3,8 +3,9 @@
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
-import { realtime, asAttendance, asLeaveRequest } from "@/lib/realtime";
+import { realtime, asAttendance, asLeaveRequest, asPresence, asGeofenceEvent } from "@/lib/realtime";
 import { useAttendanceStore, useLeaveStore } from "@/store/domain-store";
+import { usePresenceStore } from "@/store/presence-store";
 import { useUiStore } from "@/store/ui-store";
 import { LEAVE_TYPE_LABELS } from "@/constants";
 
@@ -56,12 +57,34 @@ export function useRealtimeBridge() {
           useLeaveStore.getState().upsert(req);
           break;
         }
+        case "presence:update": {
+          const p = asPresence(event.payload);
+          usePresenceStore.getState().upsert(p);
+          break;
+        }
+        case "presence:geofence": {
+          const fence = asGeofenceEvent(event.payload);
+          usePresenceStore.getState().applyGeofence(fence);
+          toast.info(
+            fence.type === "enter"
+              ? `${fence.employeeName} arrived at ${fence.locationName}`
+              : `${fence.employeeName} left ${fence.locationName}`,
+            {
+              description: fence.type === "enter" ? "Auto checked in via phone geofence" : "Geofence exit detected",
+            },
+          );
+          break;
+        }
       }
 
       // Keep every live surface fresh
       void queryClient.invalidateQueries({ queryKey: ["overview"] });
       void queryClient.invalidateQueries({ queryKey: ["attendance"] });
       void queryClient.invalidateQueries({ queryKey: ["stats"] });
+      if (event.event === "presence:geofence") {
+        void queryClient.invalidateQueries({ queryKey: ["presence"] });
+        void queryClient.invalidateQueries({ queryKey: ["locations"] });
+      }
     });
 
     return () => {

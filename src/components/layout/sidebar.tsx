@@ -13,6 +13,7 @@ import {
   BarChart3,
   X,
   Sparkles,
+  MapPin,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUiStore } from "@/store/ui-store";
@@ -37,6 +38,7 @@ const NAV: NavEntry[] = [
   { label: "Shifts", href: "/dashboard/shifts", icon: Timer },
   { label: "Attendance", href: "/dashboard/attendance", icon: Fingerprint },
   { label: "Leave", href: "/dashboard/leave", icon: PlaneTakeoff, badgeKey: "leave" },
+  { label: "Locations", href: "/dashboard/locations", icon: MapPin },
   { label: "Reports", href: "/dashboard/reports", icon: BarChart3 },
 ];
 
@@ -52,7 +54,7 @@ function NavRow({ entry, collapsed }: { entry: NavEntry; collapsed: boolean }) {
       className={cn(
         "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium transition-colors",
         collapsed && "justify-center px-0",
-        active ? "text-sidebar-accent-foreground" : "text-sidebar-foreground hover:text-foreground",
+        active ? "text-sidebar-accent-foreground" : "text-sidebar-foreground hover:text-sidebar-foreground/95 hover:bg-white/[0.06]"
       )}
     >
       {active && (
@@ -146,7 +148,7 @@ export function Sidebar() {
             <button
               type="button"
               onClick={toggle}
-              className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium text-sidebar-foreground hover:text-foreground"
+              className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium text-sidebar-foreground transition-colors hover:bg-white/[0.06] hover:text-white"
             >
               <ChevronsLeft className="h-4 w-4 opacity-70" />
               Collapse menu
@@ -170,7 +172,7 @@ export function Sidebar() {
         <button
           type="button"
           onClick={toggle}
-          className="mb-4 flex justify-center text-slate-400 hover:text-white"
+          className="mb-4 flex justify-center text-slate-400 transition-colors hover:text-white"
           aria-label="Expand sidebar"
         >
           <ChevronsLeft className="h-4 w-4 rotate-180" />

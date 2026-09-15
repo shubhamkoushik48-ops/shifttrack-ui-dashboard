@@ -12,6 +12,7 @@ const LABELS: Record<string, string> = {
   shifts: "Shifts",
   attendance: "Attendance",
   leave: "Leave",
+  locations: "Locations",
   reports: "Reports",
 };
 

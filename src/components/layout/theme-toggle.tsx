@@ -2,39 +2,55 @@
 
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import { Moon, Sun } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Check, Monitor, Moon, Sun } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 
+const OPTIONS = [
+  { value: "light", label: "Light", icon: Sun, hint: "Bright surfaces" },
+  { value: "dark", label: "Dark", icon: Moon, hint: "Low-light comfort" },
+  { value: "system", label: "System", icon: Monitor, hint: "Match your device" },
+] as const;
+
 export function ThemeToggle() {
-  const { resolvedTheme, setTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
-  if (!mounted) return <div className="h-9 w-9" />;
-
-  const isDark = resolvedTheme === "dark";
+  const active = mounted ? (theme ?? "system") : "system";
+  const ActiveIcon = active === "dark" ? Moon : active === "system" ? Monitor : Sun;
 
   return (
-    <Button
-      variant="ghost"
-      size="icon"
-      aria-label="Toggle theme"
-      onClick={() => setTheme(isDark ? "light" : "dark")}
-      className="relative overflow-hidden"
-    >
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.span
-          key={isDark ? "moon" : "sun"}
-          initial={{ y: 12, opacity: 0, rotate: -30 }}
-          animate={{ y: 0, opacity: 1, rotate: 0 }}
-          exit={{ y: -12, opacity: 0, rotate: 30 }}
-          transition={{ duration: 0.18 }}
-          className="flex"
-        >
-          {isDark ? <Moon className="h-[18px] w-[18px]" /> : <Sun className="h-[18px] w-[18px]" />}
-        </motion.span>
-      </AnimatePresence>
-    </Button>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" aria-label="Change theme">
+          <ActiveIcon className="h-[18px] w-[18px]" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-44">
+        {OPTIONS.map((opt) => {
+          const isActive = active === opt.value;
+          return (
+            <DropdownMenuItem
+              key={opt.value}
+              onClick={() => setTheme(opt.value)}
+              className="gap-2.5"
+            >
+              <opt.icon className="h-4 w-4 text-muted-foreground" />
+              <span className="flex-1">
+                <span className="block text-[13px] font-medium">{opt.label}</span>
+                <span className="block text-[10px] text-muted-foreground">{opt.hint}</span>
+              </span>
+              {isActive && <Check className="h-3.5 w-3.5 text-primary" />}
+            </DropdownMenuItem>
+          );
+        })}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

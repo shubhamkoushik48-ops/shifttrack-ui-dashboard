@@ -1,5 +1,15 @@
 import { generateAttendance, generateEmployees, generateLeaveRequests, generateShifts, isoDay } from "./generators";
-import type { AttendanceRecord, Employee, LeaveRequest, Shift } from "@/types";
+import { generateLocations, generatePresence } from "./locations";
+import type {
+  AttendanceRecord,
+  BusinessLocation,
+  BusinessLocationInput,
+  Employee,
+  EmployeePresence,
+  GeofenceEvent,
+  LeaveRequest,
+  Shift,
+} from "@/types";
 
 /**
  * Deterministic in-memory "database".
@@ -10,6 +20,8 @@ class MockDatabase {
   shifts: Shift[] = [];
   attendance: AttendanceRecord[] = [];
   leaveRequests: LeaveRequest[] = [];
+  locations: BusinessLocation[] = [];
+  presence: EmployeePresence[] = [];
   private nextEmployeeNum = 49;
 
   constructor() {
@@ -17,6 +29,8 @@ class MockDatabase {
     this.shifts = generateShifts(this.employees);
     this.attendance = generateAttendance(this.employees, 45);
     this.leaveRequests = generateLeaveRequests(this.employees);
+    this.locations = generateLocations();
+    this.presence = generatePresence(this.employees);
   }
 
   // ── Employees ─────────────────────────────────────────────────────────
@@ -236,6 +250,156 @@ class MockDatabase {
     if (!rec) return null;
     rec.status = status;
     return rec;
+  }
+
+  // ── Business locations ────────────────────────────────────────────────
+  listLocations(): BusinessLocation[] {
+    return [...this.locations];
+  }
+
+  getLocation(id: string) {
+    return this.locations.find((l) => l.id === id) ?? null;
+  }
+
+  createLocation(input: Partial<BusinessLocationInput>): BusinessLocation {
+    const location: BusinessLocation = {
+      id: `loc_${Math.random().toString(36).slice(2, 8)}`,
+      name: input.name ?? "New Office",
+      address: input.address ?? "—",
+      timezone: input.timezone ?? "UTC",
+      latitude: input.latitude ?? 0,
+      longitude: input.longitude ?? 0,
+      geofenceRadiusM: input.geofenceRadiusM ?? 120,
+      isHeadquarters: input.isHeadquarters ?? false,
+      isOpen: true,
+      manager: input.manager ?? "Unassigned",
+      capacity: input.capacity ?? 40,
+      zones: [
+        { id: "z_1", name: "Main Floor", kind: "workspace", x: 0.05, y: 0.08, w: 0.55, h: 0.38 },
+        { id: "z_2", name: "Meeting Room", kind: "meeting", x: 0.66, y: 0.08, w: 0.28, h: 0.18 },
+        { id: "z_3", name: "Break Area", kind: "social", x: 0.05, y: 0.54, w: 0.4, h: 0.2 },
+        { id: "z_4", name: "Reception", kind: "utility", x: 0.5, y: 0.54, w: 0.44, h: 0.2 },
+      ],
+      createdAt: new Date().toISOString(),
+    };
+    if (location.isHeadquarters) {
+      for (const l of this.locations) l.isHeadquarters = false;
+    }
+    this.locations.push(location);
+    return location;
+  }
+
+  updateLocation(id: string, patch: Partial<BusinessLocation>): BusinessLocation | null {
+    const loc = this.getLocation(id);
+    if (!loc) return null;
+    Object.assign(loc, patch);
+    if (patch.isHeadquarters) {
+      for (const l of this.locations) if (l.id !== id) l.isHeadquarters = false;
+    }
+    return loc;
+  }
+
+  deleteLocation(id: string): boolean {
+    const before = this.locations.length;
+    this.locations = this.locations.filter((l) => l.id !== id);
+    const removed = this.locations.length < before;
+    if (removed) {
+      for (const p of this.presence) {
+        if (p.locationId === id) {
+          p.locationId = null;
+          p.locationName = null;
+          p.zoneId = null;
+          p.zoneName = null;
+          p.x = null;
+          p.y = null;
+          p.status = "checked_out";
+        }
+      }
+    }
+    return removed;
+  }
+
+  listPresence(locationId?: string): EmployeePresence[] {
+    const rows = locationId ? this.presence.filter((p) => p.locationId === locationId) : this.presence;
+    return [...rows];
+  }
+
+  getPresenceFor(employeeId: string): EmployeePresence | null {
+    return this.presence.find((p) => p.employeeId === employeeId) ?? null;
+  }
+
+  updatePresence(employeeId: string, patch: Partial<EmployeePresence>): EmployeePresence | null {
+    const p = this.presence.find((x) => x.employeeId === employeeId) ?? null;
+    if (!p) return null;
+    Object.assign(p, patch);
+    return p;
+  }
+
+  /** Simulator helper: nudge a random on-site employee within their zone. */
+  moveRandomOnSiteEmployee(): EmployeePresence | null {
+    const movers = this.presence.filter((p) => p.status === "on_site" && p.locationId && p.sharingEnabled);
+    if (!movers.length) return null;
+    const p = movers[Math.floor(Math.random() * movers.length)]!;
+    const loc = this.getLocation(p.locationId!);
+    const zone = loc?.zones.find((z) => z.id === p.zoneId) ?? loc?.zones[0];
+    if (!loc || !zone) return null;
+    p.x = Math.min(0.96, Math.max(0.04, zone.x + 0.06 + Math.random() * (zone.w - 0.12)));
+    p.y = Math.min(0.96, Math.max(0.04, zone.y + 0.06 + Math.random() * (zone.h - 0.12)));
+    p.lastPingAt = new Date().toISOString();
+    p.accuracyM = 4 + Math.floor(Math.random() * 18);
+    return { ...p };
+  }
+
+  /** Simulator helper: someone arrives at or leaves an office. */
+  randomGeofenceTransition(): GeofenceEvent | null {
+    const entering = this.presence.find((p) => p.status !== "on_site" && p.sharingEnabled);
+    const leaving = this.presence.find((p) => p.status === "on_site" && p.sharingEnabled);
+    const open = this.locations.filter((l) => l.isOpen);
+    if (!open.length) return null;
+
+    const willEnter = (entering ? 1 : 0) + (leaving ? 1 : 0) > 1 ? Math.random() < 0.5 : !!entering;
+    if (willEnter && entering) {
+      const loc = open[Math.floor(Math.random() * open.length)]!;
+      const zone = loc.zones[Math.floor(Math.random() * loc.zones.length)] ?? null;
+      entering.status = "on_site";
+      entering.locationId = loc.id;
+      entering.locationName = loc.name;
+      entering.zoneId = zone?.id ?? null;
+      entering.zoneName = zone?.name ?? null;
+      entering.x = zone ? zone.x + 0.1 + Math.random() * Math.max(0.05, zone.w - 0.2) : null;
+      entering.y = zone ? zone.y + 0.1 + Math.random() * Math.max(0.05, zone.h - 0.2) : null;
+      entering.arrivedAt = new Date().toISOString();
+      entering.lastPingAt = new Date().toISOString();
+      return {
+        type: "enter",
+        employeeId: entering.employeeId,
+        employeeName: entering.employeeName,
+        locationId: loc.id,
+        locationName: loc.name,
+        at: new Date().toISOString(),
+      };
+    }
+    if (leaving) {
+      const locName = leaving.locationName ?? "office";
+      leaving.status = "checked_out";
+      leaving.locationId = null;
+      leaving.locationName = null;
+      leaving.zoneId = null;
+      leaving.zoneName = null;
+      leaving.x = null;
+      leaving.y = null;
+      leaving.arrivedAt = null;
+      leaving.lastPingAt = new Date().toISOString();
+      return {
+        type: "exit",
+        employeeId: leaving.employeeId,
+        employeeName: leaving.employeeName,
+        locationId: "",
+        locationName: locName,
+        at: new Date().toISOString(),
+      }; 
+    }
+    return null;
   }
 
   // ── Leave ─────────────────────────────────────────────────────────────

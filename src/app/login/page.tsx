@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/switch";
 import { authService } from "@/services";
-import { useAuthStore } from "@/store/auth-store";
+import { useAuthStore, useIsAuthenticated } from "@/store/auth-store";
 import { getApiErrorMessage } from "@/lib/api-client";
 
 const loginSchema = z.object({
@@ -26,6 +26,18 @@ type LoginForm = z.infer<typeof loginSchema>;
 export default function LoginPage() {
   const router = useRouter();
   const login = useAuthStore((s) => s.login);
+  const authed = useIsAuthenticated();
+  const hydrated = useAuthStore((s) => s.hydrated);
+
+  // Already signed in (e.g. session persisted) — skip the form.
+  // Belt-and-braces: onRehydrateStorage is not guaranteed to fire, so flip the
+  // hydration flag on mount like the dashboard shell does.
+  useEffect(() => {
+    if (!useAuthStore.getState().hydrated) useAuthStore.setState({ hydrated: true });
+  }, []);
+  useEffect(() => {
+    if (hydrated && authed) router.replace("/dashboard/overview");
+  }, [hydrated, authed, router]);
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
@@ -57,6 +69,7 @@ export default function LoginPage() {
   return (
     <div className="relative flex min-h-screen">
       {/* Left — brand panel */}
+      {/* Signed-in users are redirected to the dashboard via the effect above. */}
       <div className="relative hidden w-[46%] flex-col justify-between overflow-hidden bg-sidebar p-10 lg:flex">
         <div
           className="absolute inset-0 opacity-[0.35]"

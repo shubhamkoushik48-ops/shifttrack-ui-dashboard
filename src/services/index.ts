@@ -1,11 +1,14 @@
 import { http } from "@/lib/api-client";
 import type {
+  BusinessLocation,
+  BusinessLocationInput,
+  Employee,
+  EmployeePresence,
   LeaveRequest,
   AttendanceRecord,
   AuthSession,
   CurrentlyClockedIn,
   DashboardStats,
-  Employee,
   OverviewSnapshot,
   Paginated,
   RecentActivity,
@@ -137,6 +140,36 @@ export const leaveService = {
   },
   async decide(id: string, action: "approve" | "reject", note?: string): Promise<LeaveRequest> {
     const res = await http.post<LeaveRequest>(`/leave-requests/${id}/${action}`, { note });
+    return res.data;
+  },
+};
+
+export const locationService = {
+  async list(): Promise<BusinessLocation[]> {
+    const res = await http.get<BusinessLocation[]>("/locations");
+    return res.data;
+  },
+  async create(input: Partial<BusinessLocationInput>): Promise<BusinessLocation> {
+    const res = await http.post<BusinessLocation>("/locations", input);
+    return res.data;
+  },
+  async update(id: string, patch: Partial<BusinessLocation>): Promise<BusinessLocation> {
+    const res = await http.patch<BusinessLocation>(`/locations/${id}`, patch);
+    return res.data;
+  },
+  async remove(id: string): Promise<{ ok: boolean }> {
+    const res = await http.delete<{ ok: boolean }>(`/locations/${id}`);
+    return res.data;
+  },
+};
+
+export const presenceService = {
+  async list(locationId?: string): Promise<EmployeePresence[]> {
+    const res = await http.get<EmployeePresence[]>("/presence", { params: { locationId } });
+    return res.data;
+  },
+  async setSharing(employeeId: string, enabled: boolean): Promise<EmployeePresence> {
+    const res = await http.patch<EmployeePresence>(`/presence/${employeeId}/sharing`, { enabled });
     return res.data;
   },
 };

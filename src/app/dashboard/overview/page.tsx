@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useMemo } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -25,8 +26,10 @@ import { ErrorState } from "@/components/ui/skeleton";
 import { KpiCard } from "@/components/dashboard/kpi-card";
 import { AttendanceTrendChart, DepartmentDonut } from "@/components/dashboard/charts";
 import { StatusBadge } from "@/components/dashboard/attendance-status-badge";
-import { useOverview } from "@/hooks/use-queries";
-import { formatTime, formatDuration, pct } from "@/lib/utils";
+import { Building2, MapPin } from "lucide-react";
+import { useLocations, useOverview, usePresence } from "@/hooks/use-queries";
+import { usePresenceStore } from "@/store/presence-store";
+import { cn, formatTime, formatDuration, pct } from "@/lib/utils";
 import { LEAVE_TYPE_LABELS } from "@/constants";
 
 const ACTIVITY_ICONS = {
@@ -41,6 +44,30 @@ const ACTIVITY_ICONS = {
 
 export default function OverviewPage() {
   const { data, isLoading, isError, refetch } = useOverview();
+  const { data: locations } = useLocations();
+  const { data: presenceRows } = usePresence("all");
+  const livePresence = usePresenceStore((s) => s.presence);
+  const hydratePresence = usePresenceStore((s) => s.hydrate);
+
+  useEffect(() => {
+    if (presenceRows) hydratePresence(presenceRows);
+  }, [presenceRows, hydratePresence]);
+
+  const onSiteByLocation = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const p of livePresence.values()) {
+      if (p.status === "on_site" && p.locationId) {
+        counts.set(p.locationId, (counts.get(p.locationId) ?? 0) + 1);
+      }
+    }
+    return counts;
+  }, [livePresence]);
+
+  const totalOnSite = useMemo(() => {
+    let n = 0;
+    for (const p of livePresence.values()) if (p.status === "on_site") n++;
+    return n;
+  }, [livePresence]);
 
   if (isError) {
     return (
@@ -290,8 +317,8 @@ export default function OverviewPage() {
         </Card>
       </div>
 
-      {/* Activity + upcoming shifts */}
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+      {/* Activity + on-site + upcoming shifts */}
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
         <Card className="xl:col-span-2">
           <CardHeader>
             <CardTitle>Recent Activity</CardTitle>
@@ -327,6 +354,64 @@ export default function OverviewPage() {
                         {formatDistanceToNow(new Date(a.at), { addSuffix: true })}
                       </span>
                     </motion.div>
+                  );
+                })}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex-row items-center justify-between space-y-0">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                On Site Now
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute h-full w-full animate-ping rounded-full bg-success opacity-60" />
+                  <span className="relative h-2 w-2 rounded-full bg-success" />
+                </span>
+              </CardTitle>
+              <CardDescription>People inside office geofences · live from phones</CardDescription>
+            </div>
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/dashboard/locations">
+                {totalOnSite} <ArrowRight className="ml-1 h-3.5 w-3.5" />
+              </Link>
+            </Button>
+          </CardHeader>
+          <CardContent>
+            {(locations ?? []).length === 0 ? (
+              <EmptyState icon={<MapPin className="h-5 w-5" />} title="No offices yet" description="Add offices under Locations to see live presence." />
+            ) : (
+              <div className="space-y-2">
+                {(locations ?? []).map((loc) => {
+                  const n = onSiteByLocation.get(loc.id) ?? 0;
+                  const fill = loc.capacity ? Math.min(100, Math.round((n / loc.capacity) * 100)) : 0;
+                  return (
+                    <Link
+                      key={loc.id}
+                      href="/dashboard/locations"
+                      className="block rounded-lg px-2 py-2 transition-colors hover:bg-muted/50"
+                    >
+                      <div className="mb-1.5 flex items-center justify-between text-[12px]">
+                        <span className="flex items-center gap-1.5 font-medium">
+                          <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
+                          {loc.name}
+                          {loc.isHeadquarters && <Badge className="px-1.5 py-0 text-[9px]">HQ</Badge>}
+                        </span>
+                        <span className="tabular text-muted-foreground">
+                          {n}/{loc.capacity}
+                        </span>
+                      </div>
+                      <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+                        <motion.div
+                          className={cn("h-full rounded-full", fill > 90 ? "bg-destructive" : fill > 65 ? "bg-warning" : "bg-success")}
+                          initial={{ width: 0 }}
+                          animate={{ width: `${fill}%` }}
+                          transition={{ duration: 0.6, ease: "easeOut" }}
+                        />
+                      </div>
+                    </Link>
                   );
                 })}
               </div>

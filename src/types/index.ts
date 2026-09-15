@@ -217,6 +217,93 @@ export interface OverviewSnapshot {
   departmentDistribution: DepartmentDistribution[];
 }
 
+// ── Business Locations & On-site Presence ───────────────────────────────
+export type ZoneKind = "workspace" | "meeting" | "focus" | "social" | "utility";
+
+export interface OfficeZone {
+  id: ID;
+  name: string;
+  kind: ZoneKind;
+  // Normalized floor-plan rectangle (0–1 relative to plan bounds)
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+export interface BusinessLocation {
+  id: ID;
+  name: string;
+  address: string;
+  timezone: string;
+  latitude: number;
+  longitude: number;
+  geofenceRadiusM: number; // auto check-in radius
+  isHeadquarters: boolean;
+  isOpen: boolean;
+  manager: string;
+  capacity: number;
+  zones: OfficeZone[];
+  createdAt: string;
+}
+
+export interface BusinessLocationInput {
+  name: string;
+  address: string;
+  timezone: string;
+  latitude: number;
+  longitude: number;
+  geofenceRadiusM: number;
+  isHeadquarters: boolean;
+  capacity: number;
+  manager?: string;
+}
+
+export type PresenceSource = "phone_gps" | "wifi" | "beacon";
+
+export interface EmployeePresence {
+  id: ID;
+  employeeId: ID;
+  employeeName: string;
+  department: string;
+  avatarSeed: string;
+  locationId: ID | null;
+  locationName: string | null;
+  zoneId: ID | null;
+  zoneName: string | null;
+  status: "on_site" | "en_route" | "checked_out";
+  /** Normalized position on the floor plan (0–1); null when off-site. */
+  x: number | null;
+  y: number | null;
+  source: PresenceSource;
+  accuracyM: number;
+  batteryPct: number | null;
+  sharingEnabled: boolean;
+  lastPingAt: string; // ISO
+  arrivedAt: string | null; // ISO
+}
+
+export interface GeofenceEvent {
+  type: "enter" | "exit";
+  employeeId: ID;
+  employeeName: string;
+  locationId: ID;
+  locationName: string;
+  at: string;
+}
+
+export interface LocationPresenceSnapshot {
+  locations: BusinessLocation[];
+  presence: EmployeePresence[];
+  summary: {
+    totalLocations: number;
+    totalOnSite: number;
+    enRoute: number;
+    sharingPaused: number;
+    trackedEmployees: number;
+  };
+}
+
 // ── Realtime (Socket.IO contracts) ──────────────────────────────────────
 export type RealtimeEventName =
   | "attendance:update"
@@ -225,7 +312,9 @@ export type RealtimeEventName =
   | "leave:new"
   | "leave:decision"
   | "shift:update"
-  | "employee:update";
+  | "employee:update"
+  | "presence:update"
+  | "presence:geofence";
 
 export interface RealtimeEvent<T = unknown> {
   event: RealtimeEventName;

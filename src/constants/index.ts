@@ -111,3 +111,19 @@ export const SHIFT_STATUS_OPTIONS = [
 ] as const;
 
 export const DAYS_OF_WEEK = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
+
+export const TIMEZONES = [
+  "America/New_York",
+  "America/Chicago",
+  "America/Denver",
+  "America/Los_Angeles",
+  "America/Toronto",
+  "Europe/London",
+  "Europe/Berlin",
+  "Europe/Paris",
+  "Asia/Singapore",
+  "Asia/Tokyo",
+  "Asia/Kolkata",
+  "Australia/Sydney",
+  "UTC",
+] as const;

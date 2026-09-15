@@ -15,6 +15,7 @@ import {
   Sun,
   Users,
   Timer,
+  MapPin,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -29,6 +30,7 @@ const PAGES = [
   { label: "Shifts", href: "/dashboard/shifts", icon: Timer },
   { label: "Attendance", href: "/dashboard/attendance", icon: Fingerprint },
   { label: "Leave", href: "/dashboard/leave", icon: PlaneTakeoff },
+  { label: "Locations", href: "/dashboard/locations", icon: MapPin },
   { label: "Reports", href: "/dashboard/reports", icon: BarChart3 },
 ];
 

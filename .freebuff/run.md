@@ -30,3 +30,16 @@
 4. Register `http://localhost:3100/login` with the returned pid.
 5. Login: any email + password of 8+ characters (mock auth). The dashboard
    lives under `/dashboard/*`.
+
+## Troubleshooting
+
+- **500 on pages with `TypeError: Cannot read properties of undefined
+  (reading 'call')` in the log** — the `.next` cache is corrupted, usually
+  because `npm run build` (production) was executed while the dev server was
+  running: both write to `.next`. Fix: stop the dev server, `rm -rf .next`,
+  start it again. Avoid production builds while the dev server is live.
+- **404 for a newly added route** — the dev server was started before the
+  route file existed and serves a stale manifest. Restart the server.
+- **PowerShell `Start-Process` appears to hang** — it does not exit while
+  `npm.cmd` runs; the server still starts. Wrap the launch in a backgrounded
+  shell command and then verify with `netstat -ano | grep :3100`.

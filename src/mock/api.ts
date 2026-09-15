@@ -176,5 +176,38 @@ export async function mockRequest<T>(
     return req as T;
   }
 
+  // ── Business locations & presence ────────────────────────────────────
+  if (path === "/locations" && method === "GET") {
+    return db.listLocations() as T;
+  }
+  if (path === "/locations" && method === "POST") {
+    return db.createLocation(body as never) as T;
+  }
+  const locMatch = path.match(/^\/locations\/([^/]+)$/);
+  if (locMatch) {
+    const id = locMatch[1]!;
+    if (method === "GET") {
+      const loc = db.getLocation(id);
+      if (!loc) throw new Error("Location not found");
+      return loc as T;
+    }
+    if (method === "PATCH") return db.updateLocation(id, body as never) as T;
+    if (method === "DELETE") return { ok: db.deleteLocation(id) } as T;
+  }
+  if (path === "/presence" && method === "GET") {
+    const locationId = q.get("locationId") ?? undefined;
+    return db.listPresence(locationId && locationId !== "all" ? locationId : undefined) as T;
+  }
+  const presenceToggle = path.match(/^\/presence\/([^/]+)\/sharing$/);
+  if (presenceToggle && method === "PATCH") {
+    const { enabled } = (body ?? {}) as { enabled?: boolean };
+    const p = db.updatePresence(presenceToggle[1]!, {
+      sharingEnabled: enabled ?? false,
+      lastPingAt: new Date().toISOString(),
+    });
+    if (!p) throw new Error("Presence not found");
+    return p as T;
+  }
+
   throw new Error(`No mock handler for ${method} ${path}`);
 }

@@ -7,13 +7,15 @@ import {
   dashboardService,
   employeeService,
   leaveService,
+  locationService,
+  presenceService,
   reportService,
   shiftService,
   type EmployeeQuery,
 } from "@/services";
 import { getApiErrorMessage } from "@/lib/api-client";
 import { isoDay } from "@/mock/db";
-import type { Employee, LeaveRequest, Shift } from "@/types";
+import type { BusinessLocation, BusinessLocationInput, Employee, LeaveRequest, Shift } from "@/types";
 
 const IMMUTABLE_HYDRATION = { staleTime: 15_000, refetchOnWindowFocus: true } as const;
 
@@ -30,6 +32,8 @@ export const qk = {
     ["attendance", q] as const,
   leave: (status: string) => ["leave", status] as const,
   report: (range: string) => ["report", range] as const,
+  locations: ["locations"] as const,
+  presence: (locationId: string) => ["presence", locationId] as const,
 };
 
 // ── Dashboard ───────────────────────────────────────────────────────────
@@ -187,6 +191,78 @@ export function useReport(range: "daily" | "weekly" | "monthly") {
     queryKey: qk.report(range),
     queryFn: () => reportService.summary(range),
     ...IMMUTABLE_HYDRATION,
+  });
+}
+
+// ── Business locations & presence ──────────────────────────────────────
+export function useLocations() {
+  return useQuery({
+    queryKey: qk.locations,
+    queryFn: () => locationService.list(),
+    ...IMMUTABLE_HYDRATION,
+  });
+}
+
+export function useCreateLocation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (input: Partial<BusinessLocationInput>) => locationService.create(input),
+    onSuccess: (loc) => {
+      toast.success(`“${loc.name}” added to your offices`);
+      void qc.invalidateQueries({ queryKey: ["locations"] });
+    },
+    onError: (e) => toast.error(getApiErrorMessage(e)),
+  });
+}
+
+export function useUpdateLocation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, patch }: { id: string; patch: Partial<BusinessLocation> }) =>
+      locationService.update(id, patch),
+    onSuccess: (loc) => {
+      toast.success(`“${loc.name}” updated`);
+      void qc.invalidateQueries({ queryKey: ["locations"] });
+      void qc.invalidateQueries({ queryKey: ["presence"] });
+    },
+    onError: (e) => toast.error(getApiErrorMessage(e)),
+  });
+}
+
+export function useDeleteLocation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => locationService.remove(id),
+    onSuccess: () => {
+      toast.success("Office removed");
+      void qc.invalidateQueries({ queryKey: ["locations"] });
+      void qc.invalidateQueries({ queryKey: ["presence"] });
+    },
+    onError: (e) => toast.error(getApiErrorMessage(e)),
+  });
+}
+
+export function usePresence(locationId: string) {
+  return useQuery({
+    queryKey: qk.presence(locationId),
+    queryFn: () => presenceService.list(locationId === "all" ? undefined : locationId),
+    refetchInterval: 30_000, // presence pings refresh on an interval too
+    ...IMMUTABLE_HYDRATION,
+  });
+}
+
+export function useToggleSharing() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ employeeId, enabled }: { employeeId: string; enabled: boolean }) =>
+      presenceService.setSharing(employeeId, enabled),
+    onSuccess: (p) => {
+      toast.success(
+        p.sharingEnabled ? `Location sharing on — ${p.employeeName}` : `Location sharing paused — ${p.employeeName}`,
+      );
+      void qc.invalidateQueries({ queryKey: ["presence"] });
+    },
+    onError: (e) => toast.error(getApiErrorMessage(e)),
   });
 }
 

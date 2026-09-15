@@ -2,7 +2,15 @@
 
 import { io, type Socket } from "socket.io-client";
 import { db, isoDay } from "@/mock/db";
-import type { AttendanceRecord, Employee, LeaveRequest, Shift, RealtimeStatus } from "@/types";
+import type {
+  AttendanceRecord,
+  Employee,
+  EmployeePresence,
+  GeofenceEvent,
+  LeaveRequest,
+  Shift,
+  RealtimeStatus,
+} from "@/types";
 
 export type RealtimeEventName =
   | "attendance:update"
@@ -11,7 +19,9 @@ export type RealtimeEventName =
   | "leave:new"
   | "leave:decision"
   | "shift:update"
-  | "employee:update";
+  | "employee:update"
+  | "presence:update"
+  | "presence:geofence";
 
 export interface RealtimeEvent<T = unknown> {
   event: RealtimeEventName;
@@ -29,6 +39,8 @@ const EVENT_NAMES: RealtimeEventName[] = [
   "leave:decision",
   "shift:update",
   "employee:update",
+  "presence:update",
+  "presence:geofence",
 ];
 
 /**
@@ -159,7 +171,22 @@ class RealtimeClient {
       const roll = Math.random();
       const today = isoDay(new Date());
 
-      if (roll < 0.4) {
+      // ~1 in 4 ticks: movement of an on-site employee (phone GPS pulse)
+      if (roll < 0.25) {
+        const moved = db.moveRandomOnSiteEmployee();
+        if (moved) {
+          this.dispatch({ event: "presence:update", payload: moved, at: new Date().toISOString() });
+          return;
+        }
+      } else if (roll < 0.33) {
+        const fence = db.randomGeofenceTransition();
+        if (fence) {
+          this.dispatch({ event: "presence:geofence", payload: fence, at: new Date().toISOString() });
+          return;
+        }
+      }
+
+      if (roll < 0.55) {
         // Clock-in
         const candidates = db.employees.filter((e) => {
           if (e.status !== "active") return false;
@@ -235,4 +262,10 @@ export function asLeaveRequest(payload: unknown): LeaveRequest {
 }
 export function asShift(payload: unknown): Shift {
   return payload as Shift;
+}
+export function asPresence(payload: unknown): EmployeePresence {
+  return payload as EmployeePresence;
+}
+export function asGeofenceEvent(payload: unknown): GeofenceEvent {
+  return payload as GeofenceEvent;
 }

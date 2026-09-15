@@ -1,0 +1,177 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 40% 98%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    /* Brand #2563EB */
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 214.3 95% 96.5%;
+    --accent-foreground: 221.6 83.2% 40%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    /* #22C55E */
+    --success: 142.1 71% 45.3%;
+    --success-foreground: 0 0% 100%;
+    /* #F59E0B */
+    --warning: 37.7 92.1% 50.2%;
+    --warning-foreground: 15 80% 12%;
+    /* #3B82F6 */
+    --info: 217.2 91.2% 59.8%;
+    --info-foreground: 0 0% 100%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+
+    --radius: 0.625rem;
+
+    --sidebar: 222.2 47.4% 11.2%;
+    --sidebar-foreground: 214.3 31.8% 80%;
+    --sidebar-accent: 217.2 91.2% 60%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 217.2 32.6% 17.5%;
+    --sidebar-ring: 221.2 83.2% 53.3%;
+
+    --chart-1: 221.2 83.2% 53.3%;
+    --chart-2: 142.1 71% 45.3%;
+    --chart-3: 37.7 92.1% 50.2%;
+    --chart-4: 0 84.2% 60.2%;
+    --chart-5: 262.1 83.3% 57.8%;
+  }
+
+  .dark {
+    --background: 222.2 47.4% 7%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 47.4% 10%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 47.4% 9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 217.2 91.2% 60%;
+    --primary-foreground: 222.2 47.4% 8%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 221.2 83.2% 18%;
+    --accent-foreground: 213.3 96.9% 87.3%;
+
+    --destructive: 0 72.2% 50.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --success: 142.1 69.2% 48.2%;
+    --success-foreground: 0 0% 100%;
+    --warning: 37.7 92.1% 50.2%;
+    --warning-foreground: 15 80% 10%;
+    --info: 217.2 91.2% 60%;
+    --info-foreground: 0 0% 100%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 217.2 91.2% 60%;
+
+    --sidebar: 222.2 47.4% 8%;
+    --sidebar-foreground: 214.3 31.8% 80%;
+    --sidebar-accent: 217.2 91.2% 60%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 217.2 32.6% 14%;
+    --sidebar-ring: 217.2 91.2% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* Scrollbars — premium, subtle */
+  ::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.28);
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.45);
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+}
+
+@layer components {
+  /* Glassmorphism surface */
+  .glass {
+    background: hsl(var(--card) / 0.72);
+    backdrop-filter: blur(14px) saturate(1.4);
+    -webkit-backdrop-filter: blur(14px) saturate(1.4);
+  }
+
+  .text-gradient {
+    background: linear-gradient(
+      92deg,
+      hsl(var(--foreground)) 20%,
+      hsl(var(--muted-foreground)) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Recharts polish */
+.recharts-cartesian-axis-tick-value {
+  font-size: 11px;
+}
+.recharts-default-tooltip {
+  border-radius: 12px !important;
+  border: none !important;
+}

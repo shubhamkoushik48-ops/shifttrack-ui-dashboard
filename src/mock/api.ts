@@ -77,6 +77,37 @@ export async function mockRequest<T>(
     } as T;
   }
 
+  if (path === "/auth/login/social" && method === "POST") {
+    const { provider, email } = (body ?? {}) as { provider?: string; email?: string };
+    const normalized = (email ?? "").trim().toLowerCase();
+    if (!normalized) {
+      throw new ApiError("Enter your work email first so we can match your social account.", 400);
+    }
+
+    // Simulated OAuth: the provider asserts this email's identity. If an
+    // account exists it is signed into directly (linked identity); otherwise
+    // a session is issued just-in-time, mirroring the password-login convention.
+    const account = accounts.findByEmail(normalized);
+    const derivedName = normalized
+      .split("@")[0]
+      .split(/[._-]+/)
+      .filter(Boolean)
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(" ");
+
+    return {
+      user: {
+        id: account ? account.id : `usr_${provider ?? "social"}_${Math.random().toString(36).slice(2, 8)}`,
+        name: account ? account.name : derivedName || "New User",
+        email: normalized,
+        role: account ? account.role : "manager",
+        department: account ? account.department : "Operations",
+      },
+      accessToken: `mock.jwt.${Math.random().toString(36).slice(2)}`,
+      expiresAt: Date.now() + 1000 * 60 * 60 * 24 * 7,
+    } as T;
+  }
+
   if (path === "/auth/register" && method === "POST") {
     const { name, email, password, department } = (body ?? {}) as {
       name?: string;

@@ -36,6 +36,11 @@ export const authService = {
     const res = await http.post<AuthSession>("/auth/register", input);
     return res.data;
   },
+  /** Simulated OAuth handshake — a real backend would redirect to the provider. */
+  async socialLogin(provider: "google" | "facebook" | "twitter", email: string): Promise<AuthSession> {
+    const res = await http.post<AuthSession>("/auth/login/social", { provider, email });
+    return res.data;
+  },
   async logout(): Promise<void> {
     await http.post("/auth/logout");
   },

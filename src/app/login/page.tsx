@@ -14,6 +14,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/switch";
 import { authService } from "@/services";
+import {
+  SocialLoginButtons,
+  SOCIAL_PROVIDER_LABELS,
+  type SocialProvider,
+} from "@/components/auth/social-login-buttons";
 import { useAuthStore, useIsAuthenticated } from "@/store/auth-store";
 import { getApiErrorMessage } from "@/lib/api-client";
 
@@ -39,6 +44,7 @@ export default function LoginPage() {
   useEffect(() => {
     if (hydrated && authed) router.replace("/dashboard/overview");
   }, [hydrated, authed, router]);
+  const [socialLoading, setSocialLoading] = useState<SocialProvider | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
@@ -48,6 +54,8 @@ export default function LoginPage() {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
+    getValues,
+    setError,
   } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "manager@shifttrack.io", password: "shifttrack2026" },
@@ -64,6 +72,33 @@ export default function LoginPage() {
       router.push("/dashboard/overview");
     } catch (error) {
       setServerError(getApiErrorMessage(error, "Unable to sign in. Check your credentials and try again."));
+    }
+  };
+
+  const handleSocialLogin = async (provider: SocialProvider) => {
+    setServerError(null);
+    const email = (getValues("email") ?? "").trim();
+    if (!email) {
+      setError(
+        "email",
+        { message: "Enter your work email first so we can match your social account." },
+        { shouldFocus: true },
+      );
+      return;
+    }
+    setSocialLoading(provider);
+    try {
+      const session = await authService.socialLogin(provider, email);
+      login(session);
+      setSuccess(true);
+      toast.success(`Signed in with ${SOCIAL_PROVIDER_LABELS[provider]} 👋`);
+      router.push("/dashboard/overview");
+    } catch (error) {
+      setServerError(
+        getApiErrorMessage(error, `Unable to sign in with ${SOCIAL_PROVIDER_LABELS[provider]}. Please try again.`),
+      );
+    } finally {
+      setSocialLoading(null);
     }
   };
 
@@ -239,6 +274,20 @@ export default function LoginPage() {
                 </>
               )}
             </Button>
+
+            <div className="flex items-center gap-3 py-1" role="separator" aria-label="Or continue with">
+              <div className="h-px flex-1 bg-border" />
+              <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                or continue with
+              </span>
+              <div className="h-px flex-1 bg-border" />
+            </div>
+
+            <SocialLoginButtons
+              loading={socialLoading}
+              disabled={isSubmitting || success}
+              onLogin={handleSocialLogin}
+ />
 
             <p className="text-center text-xs text-muted-foreground">
               Demo hint: <span className="font-medium text-foreground">manager@shifttrack.io</span> +

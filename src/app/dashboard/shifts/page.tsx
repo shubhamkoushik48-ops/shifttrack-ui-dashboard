@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/dialog";
 import { useDeleteShift, useShifts } from "@/hooks/use-queries";
 import { employeeService } from "@/services";
-import { DAYS_OF_WEEK } from "@/constants";
+import { DAYS_OF_WEEK } from "@/constants/Index";
 import { cn } from "@/lib/utils";
 import type { Shift } from "@/types";
 

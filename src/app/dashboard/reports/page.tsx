@@ -63,7 +63,7 @@ export default function ReportsPage() {
         filename,
       );
     }
-    toast.success(`${kind.toUpperCase()} export downloaded`);
+    toast.success(`${kind} report exported`);
   };
 
   const metrics = [

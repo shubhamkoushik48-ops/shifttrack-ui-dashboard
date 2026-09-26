@@ -29,7 +29,7 @@ import {
 import { Textarea } from "@/components/ui/input";
 import { StatusBadge } from "@/components/dashboard/attendance-status-badge";
 import { useDecideLeave, useLeaveRequests } from "@/hooks/use-queries";
-import { LEAVE_TYPE_LABELS } from "@/constants";
+import { LEAVE_TYPE_LABELS } from "@/constants/Index";
 import { cn } from "@/lib/utils";
 import type { LeaveRequest } from "@/types";
 

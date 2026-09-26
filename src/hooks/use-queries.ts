@@ -208,7 +208,7 @@ export function useCreateLocation() {
   return useMutation({
     mutationFn: (input: Partial<BusinessLocationInput>) => locationService.create(input),
     onSuccess: (loc) => {
-      toast.success(`“${loc.name}” added to your offices`);
+      toast.success(`“${loc.name}” added`);
       void qc.invalidateQueries({ queryKey: ["locations"] });
     },
     onError: (e) => toast.error(getApiErrorMessage(e)),
@@ -272,7 +272,7 @@ export function useCreateEmployee() {
   return useMutation({
     mutationFn: (input: Partial<Employee>) => employeeService.create(input),
     onSuccess: (emp) => {
-      toast.success(`${emp.name} joined the team`, { description: emp.employeeCode });
+      toast.success(`${emp.name} added`, { description: emp.employeeCode });
       void qc.invalidateQueries({ queryKey: ["employees"] });
       void qc.invalidateQueries({ queryKey: ["overview"] });
       void qc.invalidateQueries({ queryKey: ["stats"] });

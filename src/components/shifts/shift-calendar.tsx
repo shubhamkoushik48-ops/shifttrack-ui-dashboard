@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { Clock, Users } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { DAYS_OF_WEEK } from "@/constants";
+import { DAYS_OF_WEEK } from "@/constants/Index";
 import { cn } from "@/lib/utils";
 import type { Shift } from "@/types";
 

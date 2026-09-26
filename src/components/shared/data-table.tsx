@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { motion } from "framer-motion";
 import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight, Inbox } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -195,12 +194,9 @@ export function DataTable<T>({
                         </TableCell>
                       </TableRow>
                     ))
-                  : rows.map((row, i) => (
-                      <motion.tr
+                  : rows.map((row) => (
+                      <tr
                         key={rowKey(row)}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: Math.min(i * 0.02, 0.2) }}
                         className={cn(
                           "border-b border-border/60 transition-colors last:border-0 hover:bg-muted/40",
                           onRowClick && "cursor-pointer",
@@ -212,7 +208,7 @@ export function DataTable<T>({
                             {col.render(row)}
                           </TableCell>
                         ))}
-                      </motion.tr>
+                      </tr>
                     ))}
               </TableBody>
             </Table>

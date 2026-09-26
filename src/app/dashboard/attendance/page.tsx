@@ -141,7 +141,7 @@ export default function AttendancePage() {
         <Radio className="h-4 w-4 text-success" />
         <p className="text-[13px]">
           <span className="font-semibold">{liveCount} on the clock</span>
-          <span className="text-muted-foreground"> — streaming in real time via Socket.IO</span>
+          <span className="text-muted-foreground"> · updates live</span>
         </p>
         <span className="ml-auto hidden items-center gap-1.5 text-[11px] text-muted-foreground sm:flex">
           <span className="relative flex h-2 w-2">

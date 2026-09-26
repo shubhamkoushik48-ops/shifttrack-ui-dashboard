@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useCreateLocation, useUpdateLocation } from "@/hooks/use-queries";
-import { TIMEZONES } from "@/constants";
+import { TIMEZONES } from "@/constants/Index";
 import type { BusinessLocation } from "@/types";
 
 const schema = z.object({

@@ -25,7 +25,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/switch";
 import { Avatar } from "@/components/ui/avatar";
-import { DAYS_OF_WEEK, DEPARTMENTS, SHIFT_STATUS_OPTIONS } from "@/constants";
+import { DAYS_OF_WEEK, DEPARTMENTS, SHIFT_STATUS_OPTIONS } from "@/constants/Index";
 import { employeeService, shiftService } from "@/services";
 import { useCreateShift, useUpdateShift } from "@/hooks/use-queries";
 import { cn } from "@/lib/utils";

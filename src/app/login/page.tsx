@@ -115,12 +115,11 @@ export default function LoginPage() {
             Attendance, shifts and leave for your whole team.
           </h2>
           <p className="mt-3 text-sm leading-relaxed text-slate-400">
-            One workspace for clock-ins, schedules, approvals and reports.
+            Clock-ins, schedules, approvals and reports in one place.
           </p>
         </div>
 
         <div className="space-y-2 text-[13px] text-slate-400">
-          <p>Trusted by operations teams in 40+ companies.</p>
           <p>Need help? support@shifttrack.io</p>
         </div>
       </div>

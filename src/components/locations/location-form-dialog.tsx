@@ -185,7 +185,7 @@ export function LocationFormDialog({ open, onOpenChange, location }: Props) {
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit" variant="gradient" disabled={busy}>
+            <Button type="submit" disabled={busy}>
               {busy && <Loader2 className="animate-spin" />}
               {isEdit ? "Save changes" : "Add office"}
             </Button>

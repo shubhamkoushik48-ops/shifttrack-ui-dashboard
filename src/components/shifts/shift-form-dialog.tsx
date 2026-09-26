@@ -264,7 +264,7 @@ export function ShiftFormDialog({ open, onOpenChange, shift }: Props) {
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-            <Button type="submit" variant="gradient" disabled={busy}>
+            <Button type="submit" disabled={busy}>
               {busy && <Loader2 className="animate-spin" />}
               {isEdit ? "Save changes" : "Create shift"}
             </Button>

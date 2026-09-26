@@ -74,7 +74,7 @@ export default function OverviewPage() {
   if (isError) {
     return (
       <div className="space-y-4">
-        <PageHeader title="Overview" description="Your workforce at a glance." />
+        <PageHeader title="Overview" description="Attendance and activity for today." />
         <Card>
           <ErrorState onRetry={() => void refetch()} message="We couldn't load the dashboard. Check your connection and retry." />
         </Card>
@@ -138,7 +138,7 @@ export default function OverviewPage() {
     <div className="space-y-6">
       <PageHeader
         title={`Good day, ${userName.split(" ")[0]}`}
-        description={`Here's what's happening across your workforce — ${new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}.`}
+        description={new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
         actions={
           <>
             <Button variant="outline" asChild>
@@ -146,10 +146,8 @@ export default function OverviewPage() {
                 View reports <ArrowRight className="ml-1 h-3.5 w-3.5" />
               </Link>
             </Button>
-            <Button variant="gradient" asChild>
-              <Link href="/dashboard/attendance">
-                <Fingerprint /> Live attendance
-              </Link>
+            <Button asChild>
+              <Link href="/dashboard/attendance">Live attendance</Link>
             </Button>
           </>
         }
@@ -157,24 +155,17 @@ export default function OverviewPage() {
 
       {/* KPI grid */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-        {kpis.map((k, i) => (
-          <motion.div
-            key={k.label}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.05 }}
-          >
-            <Link href={k.href}>
-              <KpiCard
-                label={k.label}
-                value={k.value}
-                icon={k.icon}
-                tone={k.tone}
-                delta={k.delta}
-                loading={isLoading}
-              />
-            </Link>
-          </motion.div>
+        {kpis.map((k) => (
+          <Link key={k.label} href={k.href}>
+            <KpiCard
+              label={k.label}
+              value={k.value}
+              icon={k.icon}
+              tone={k.tone}
+              delta={k.delta}
+              loading={isLoading}
+            />
+          </Link>
         ))}
       </div>
 
@@ -338,11 +329,8 @@ export default function OverviewPage() {
                 {data?.activities.map((a, i) => {
                   const Icon = ACTIVITY_ICONS[a.type] ?? Clock;
                   return (
-                    <motion.div
+                    <div
                       key={a.id}
-                      initial={{ opacity: 0, x: -8 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.04 }}
                       className="flex items-center gap-3 rounded-lg px-2 py-2 hover:bg-muted/50"
                     >
                       <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
@@ -355,7 +343,7 @@ export default function OverviewPage() {
                       <span className="shrink-0 text-[11px] text-muted-foreground">
                         {formatDistanceToNow(new Date(a.at), { addSuffix: true })}
                       </span>
-                    </motion.div>
+                    </div>
                   );
                 })}
               </div>
@@ -406,11 +394,9 @@ export default function OverviewPage() {
                         </span>
                       </div>
                       <div className="h-1.5 overflow-hidden rounded-full bg-muted">
-                        <motion.div
+                        <div
                           className={cn("h-full rounded-full", fill > 90 ? "bg-destructive" : fill > 65 ? "bg-warning" : "bg-success")}
-                          initial={{ width: 0 }}
-                          animate={{ width: `${fill}%` }}
-                          transition={{ duration: 0.6, ease: "easeOut" }}
+                          style={{ width: `${fill}%` }}
                         />
                       </div>
                     </Link>

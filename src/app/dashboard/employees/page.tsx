@@ -147,7 +147,6 @@ export default function EmployeesPage() {
               <Download /> Export CSV
             </Button>
             <Button
-              variant="gradient"
               onClick={() => {
                 setEditing(null);
                 setFormOpen(true);

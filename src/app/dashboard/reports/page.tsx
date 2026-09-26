@@ -88,7 +88,7 @@ export default function ReportsPage() {
             <Button variant="outline" size="sm" onClick={() => handleExport("excel")}>
               <FileSpreadsheet /> Excel
             </Button>
-            <Button variant="gradient" size="sm" onClick={() => handleExport("pdf")}>
+            <Button variant="outline" size="sm" onClick={() => handleExport("pdf")}>
               <FileText /> PDF
             </Button>
           </>
@@ -145,7 +145,7 @@ export default function ReportsPage() {
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="text-[11px] text-muted-foreground">{m.label}</p>
-                    <p className="mt-1 font-display text-xl font-bold tabular">{m.value}</p>
+                    <p className="mt-1 text-xl font-bold tabular">{m.value}</p>
                   </div>
                   <span className={cn("flex h-8 w-8 items-center justify-center rounded-lg", m.tone)}>
                     <m.icon className="h-4 w-4" />
@@ -235,7 +235,7 @@ export default function ReportsPage() {
                     />
                   </svg>
                   <div className="absolute text-center">
-                    <p className="font-display text-3xl font-bold tabular">{summary.shiftUtilization}%</p>
+                    <p className="text-3xl font-bold tabular">{summary.shiftUtilization}%</p>
                     <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Utilization</p>
                   </div>
                 </div>

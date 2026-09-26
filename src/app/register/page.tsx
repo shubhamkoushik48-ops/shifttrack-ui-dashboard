@@ -6,15 +6,13 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { motion } from "framer-motion";
 import {
   Eye,
   EyeOff,
   Loader2,
   Lock,
   Mail,
-  ShieldCheck,
-  UserPlus,
+  Timer,
   Users,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -81,7 +79,7 @@ export default function RegisterPage() {
   const authed = useIsAuthenticated();
   const hydrated = useAuthStore((s) => s.hydrated);
 
-  // Already signed in — skip the form (same belt-and-braces as login).
+  // Already signed in — skip the form (same guard as login).
   useEffect(() => {
     if (!useAuthStore.getState().hydrated) useAuthStore.setState({ hydrated: true });
   }, []);
@@ -124,7 +122,7 @@ export default function RegisterPage() {
       });
       login(session);
       setSuccess(true);
-      toast.success("Account created — welcome, " + session.user.name.split(" ")[0] + " 🎉");
+      toast.success("Account created");
       router.push("/dashboard/overview");
     } catch (error) {
       setServerError(
@@ -134,108 +132,54 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="relative flex min-h-screen">
-      {/* Left — brand panel (mirrors login) */}
-      <div className="relative hidden w-[46%] flex-col justify-between overflow-hidden bg-sidebar p-10 lg:flex">
-        <div
-          className="absolute inset-0 opacity-[0.35]"
-          style={{
-            backgroundImage:
-              "radial-gradient(600px circle at 20% 20%, hsl(221 83% 53% / 0.35), transparent 45%), radial-gradient(700px circle at 80% 75%, hsl(262 83% 58% / 0.25), transparent 50%)",
-          }}
-        />
-        <div className="relative">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-glow">
-              <Users className="h-5 w-5 text-white" strokeWidth={2.5} />
-            </div>
-            <div>
-              <p className="font-display text-lg font-bold text-white">ShiftTrack</p>
-              <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-slate-400">
-                Workforce Operations
-              </p>
-            </div>
+    <div className="flex min-h-screen">
+      {/* Left — dark panel (desktop only) */}
+      <div className="hidden w-[42%] flex-col justify-between bg-sidebar p-10 lg:flex">
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
+            <Timer className="h-4.5 w-4.5 text-white" strokeWidth={2.25} />
           </div>
+          <p className="text-[15px] font-semibold text-white">ShiftTrack</p>
         </div>
 
-        <div className="relative max-w-md">
-          <motion.h2
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="font-display text-3xl font-bold leading-tight text-white"
-          >
-            Set up your workspace in <span className="text-blue-400">under a minute.</span>
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="mt-3 text-sm leading-relaxed text-slate-400"
-          >
-            Create a manager account to run attendance, shifts, leave approvals and
-            live office presence for your whole team.
-          </motion.p>
-
-          <div className="mt-8 space-y-3">
-            {[
-              { title: "Full manager toolkit", desc: "Employees, shifts, attendance, leave and reports from day one." },
-              { title: "Your data stays yours", desc: "Starts on a built-in mock backend — plug in a real API whenever." },
-              { title: "No credit card, no setup call", desc: "Create the account and land straight on your dashboard." },
-            ].map((f, i) => (
-              <motion.div
-                key={f.title}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3 + i * 0.08 }}
-                className="flex items-start gap-3 rounded-xl border border-white/10 bg-white/[0.04] p-3 backdrop-blur-sm"
-              >
-                <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
-                <div>
-                  <p className="text-[13px] font-semibold text-white">{f.title}</p>
-                  <p className="text-xs text-slate-400">{f.desc}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+        <div className="max-w-sm">
+          <h2 className="text-2xl font-semibold leading-snug text-white">
+            Run your team's attendance, shifts and leave from one place.
+          </h2>
+          <p className="mt-3 text-sm leading-relaxed text-slate-400">
+            Create a manager account to get started.
+          </p>
         </div>
 
-        <p className="relative text-[11px] text-slate-500">
-          © 2026 ShiftTrack Inc. — SOC2 · GDPR ready
-        </p>
+        <div className="space-y-2 text-[13px] text-slate-400">
+          <p>Trusted by operations teams in 40+ companies.</p>
+          <p>Need help? support@shifttrack.io</p>
+        </div>
       </div>
 
       {/* Right — form */}
-      <div className="flex flex-1 items-center justify-center bg-background px-6 py-12">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-[420px]"
-        >
+      <div className="flex flex-1 items-center justify-center px-6 py-12">
+        <div className="w-full max-w-[400px]">
           <div className="mb-8 flex items-center gap-2.5 lg:hidden">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600">
-              <Users className="h-5 w-5 text-white" strokeWidth={2.5} />
+            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
+              <Timer className="h-4.5 w-4.5 text-white" strokeWidth={2.25} />
             </div>
-            <p className="font-display text-lg font-bold">ShiftTrack</p>
+            <p className="text-[15px] font-semibold">ShiftTrack</p>
           </div>
 
-          <h1 className="font-display text-2xl font-bold tracking-tight">Create your account</h1>
-          <p className="mt-1.5 text-sm text-muted-foreground">
-            New here? Set up a manager account for your workspace.
+          <h1 className="text-xl font-semibold tracking-tight">Create an account</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Set up a manager account for your workspace.
           </p>
 
           {serverError && (
-            <div className="mt-5 flex items-start gap-2.5 rounded-lg border border-destructive/30 bg-destructive/[0.06] px-3.5 py-3">
-              <span className="mt-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-white">
-                !
-              </span>
+            <div className="mt-5 rounded-lg border border-destructive/30 bg-destructive/[0.06] px-3.5 py-2.5">
               <p className="text-[13px] text-destructive">{serverError}</p>
             </div>
           )}
           {success && (
-            <div className="mt-5 flex items-start gap-2.5 rounded-lg border border-success/30 bg-success/[0.06] px-3.5 py-3">
-              <ShieldCheck className="mt-0.5 h-4 w-4 text-success" />
-              <p className="text-[13px] text-success">Account created — setting up your dashboard…</p>
+            <div className="mt-5 rounded-lg border border-success/30 bg-success/[0.06] px-3.5 py-2.5">
+              <p className="text-[13px] text-success">Account created — redirecting…</p>
             </div>
           )}
 
@@ -377,39 +321,26 @@ export default function RegisterPage() {
               </span>
             </label>
 
-            <Button
-              type="submit"
-              variant="gradient"
-              size="xl"
-              className="w-full"
-              disabled={isSubmitting || success}
-            >
+            <Button type="submit" size="lg" className="w-full" disabled={isSubmitting || success}>
               {isSubmitting ? (
                 <>
                   <Loader2 className="animate-spin" /> Creating account…
                 </>
               ) : success ? (
-                <>
-                  <ShieldCheck /> Success — redirecting
-                </>
+                "Redirecting…"
               ) : (
-                <>
-                  <UserPlus /> Create account
-                </>
+                "Create account"
               )}
             </Button>
 
-            <p className="text-center text-sm text-muted-foreground">
+            <p className="pt-1 text-center text-[13px] text-muted-foreground">
               Already have an account?{" "}
-              <Link
-                href="/login"
-                className="font-semibold text-primary hover:underline"
-              >
+              <Link href="/login" className="font-medium text-primary hover:underline">
                 Sign in
               </Link>
             </p>
           </form>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

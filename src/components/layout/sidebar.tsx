@@ -12,7 +12,6 @@ import {
   PlaneTakeoff,
   BarChart3,
   X,
-  Sparkles,
   MapPin,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -22,7 +21,7 @@ import { useLeaveRequests } from "@/hooks/use-queries";
 import { Button } from "@/components/ui/button";
 import { Avatar } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { APP_NAME, APP_TAGLINE, APP_VERSION } from "@/constants";
+import { APP_NAME } from "@/constants";
 import type { LucideIcon } from "lucide-react";
 
 interface NavEntry {
@@ -91,13 +90,12 @@ function NavRow({ entry, collapsed }: { entry: NavEntry; collapsed: boolean }) {
 function SidebarBrand({ collapsed }: { collapsed: boolean }) {
   return (
     <div className={cn("flex h-16 items-center gap-2.5 px-4", collapsed && "justify-center px-0")}>
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 shadow-glow">
-        <Timer className="h-4.5 w-4.5 text-white" strokeWidth={2.5} />
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary">
+        <Timer className="h-4 w-4 text-white" strokeWidth={2.25} />
       </div>
       {!collapsed && (
         <div className="min-w-0">
-          <p className="truncate font-display text-[15px] font-bold tracking-tight text-white">{APP_NAME}</p>
-          <p className="truncate text-[10px] font-medium uppercase tracking-[0.14em] text-slate-400">{APP_TAGLINE}</p>
+          <p className="truncate text-[15px] font-semibold tracking-tight text-white">{APP_NAME}</p>
         </div>
       )}
     </div>
@@ -133,18 +131,14 @@ export function Sidebar() {
       <SidebarBrand collapsed={collapsedState} />
       <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-3">
         {!collapsedState && (
-          <p className="px-3 pb-1 pt-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
-            Workspace
-          </p>
+          <p className="px-3 pb-1 pt-1 text-[11px] text-slate-500">Workspace</p>
         )}
         {NAV.map((entry) => (
           <NavRow key={entry.href} entry={entry} collapsed={collapsedState} />
         ))}
         {!collapsedState && (
           <>
-            <p className="px-3 pb-1 pt-4 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
-              System
-            </p>
+            <p className="px-3 pb-1 pt-4 text-[11px] text-slate-500">System</p>
             <button
               type="button"
               onClick={toggle}
@@ -157,14 +151,9 @@ export function Sidebar() {
         )}
       </nav>
       {!collapsedState && (
-        <div className="mx-3 mb-3 rounded-xl border border-white/10 bg-gradient-to-br from-blue-600/20 to-indigo-600/10 p-3">
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-3.5 w-3.5 text-blue-300" />
-            <p className="text-[11px] font-semibold text-white">Live sync active</p>
-          </div>
-          <p className="mt-1 text-[10px] leading-relaxed text-slate-400">
-            Realtime attendance streaming to every surface.
-          </p>
+        <div className="mx-3 mb-3 flex items-center gap-2 text-[11px] text-slate-500">
+          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-success" />
+          Live sync enabled
         </div>
       )}
       <SidebarUser collapsed={collapsedState} />

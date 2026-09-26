@@ -120,7 +120,6 @@ export default function AttendancePage() {
               <Download /> Export
             </Button>
             <Button
-              variant="gradient"
               onClick={() => {
                 // Demo: clock in the first available active employee
                 const target = rows.find((r) => !r.clockIn && r.status !== "on_leave" && r.status !== "absent");
@@ -139,7 +138,7 @@ export default function AttendancePage() {
 
       {/* Live banner */}
       <div className="flex items-center gap-3 rounded-xl border border-success/25 bg-success/[0.06] px-4 py-2.5">
-        <Radio className="h-4 w-4 animate-pulse text-success" />
+        <Radio className="h-4 w-4 text-success" />
         <p className="text-[13px]">
           <span className="font-semibold">{liveCount} on the clock</span>
           <span className="text-muted-foreground"> — streaming in real time via Socket.IO</span>
@@ -160,7 +159,7 @@ export default function AttendancePage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs text-muted-foreground">{k.label}</p>
-                <p className="mt-1 font-display text-2xl font-bold tabular">
+                <p className="mt-1 text-2xl font-bold tabular">
                   {isLoading ? <span className="inline-block h-6 w-12 animate-pulse rounded bg-muted" /> : k.value}
                 </p>
               </div>

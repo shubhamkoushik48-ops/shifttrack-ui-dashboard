@@ -80,7 +80,7 @@ export function EmployeeProfileDrawer({ employee, open, onOpenChange, onEdit, on
           <Avatar name={employee.name} className="h-14 w-14 text-lg" />
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              <h2 className="truncate font-display text-lg font-bold">{employee.name}</h2>
+              <h2 className="truncate text-lg font-bold">{employee.name}</h2>
               <StatusBadge status={employee.status} />
             </div>
             <p className="text-sm text-muted-foreground">
@@ -146,7 +146,7 @@ export function EmployeeProfileDrawer({ employee, open, onOpenChange, onEdit, on
                       In {r.clockIn ? formatTime(r.clockIn) : "—"} · Out {r.clockOut ? formatTime(r.clockOut) : "—"}
                     </p>
                   </div>
-                  <p className="font-display text-lg font-bold tabular">{formatDuration(r.durationMinutes ?? 0)}</p>
+                  <p className="text-lg font-bold tabular">{formatDuration(r.durationMinutes ?? 0)}</p>
                 </div>
               ))
             )}

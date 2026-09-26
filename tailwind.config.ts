@@ -79,7 +79,7 @@ const config: Config = {
       fontFamily: {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
         mono: ["var(--font-mono)", "monospace"],
-        display: ["var(--font-display)", "var(--font-sans)", "sans-serif"],
+        display: ["var(--font-sans)", "system-ui", "sans-serif"],
       },
       keyframes: {
         "accordion-down": {
@@ -115,7 +115,6 @@ const config: Config = {
           "0 4px 8px -2px rgb(0 0 0 / 0.06), 0 12px 24px -6px rgb(0 0 0 / 0.10), 0 0 0 1px hsl(var(--border))",
         popover:
           "0 4px 6px -2px rgb(0 0 0 / 0.05), 0 16px 32px -12px rgb(0 0 0 / 0.14), 0 0 0 1px hsl(var(--border))",
-        glow: "0 0 0 1px hsl(var(--primary)/0.10), 0 4px 16px hsl(var(--primary)/0.18)",
       },
       backgroundImage: {
         "grid-pattern":

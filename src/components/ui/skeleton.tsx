@@ -20,7 +20,7 @@ function EmptyState({ icon, title, description, action, className }: EmptyStateP
       <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-muted text-muted-foreground">
         {icon ?? <span className="text-lg">◌</span>}
       </div>
-      <p className="font-display text-sm font-semibold">{title}</p>
+      <p className="text-sm font-semibold">{title}</p>
       {description ? <p className="mt-1 max-w-sm text-xs text-muted-foreground">{description}</p> : null}
       {action ? <div className="mt-4">{action}</div> : null}
     </div>
@@ -40,7 +40,7 @@ function ErrorState({ title = "Something went wrong", message, onRetry, classNam
       <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-destructive/10 text-destructive">
         <AlertTriangle className="h-5 w-5" />
       </div>
-      <p className="font-display text-sm font-semibold">{title}</p>
+      <p className="text-sm font-semibold">{title}</p>
       {message ? <p className="mt-1 max-w-sm text-xs text-muted-foreground">{message}</p> : null}
       {onRetry ? (
         <Button variant="outline" size="sm" className="mt-4" onClick={onRetry}>

@@ -68,7 +68,6 @@ export default function ShiftsPage() {
         description="Build schedules, assign people and keep every department covered."
         actions={
           <Button
-            variant="gradient"
             onClick={() => {
               setEditing(null);
               setFormOpen(true);
@@ -89,7 +88,7 @@ export default function ShiftsPage() {
         ].map((s) => (
           <Card key={s.label} className="p-4">
             <p className="text-xs text-muted-foreground">{s.label}</p>
-            <p className="mt-1 font-display text-xl font-bold tabular">{isLoading ? "—" : s.value}</p>
+            <p className="mt-1 text-xl font-bold tabular">{isLoading ? "—" : s.value}</p>
           </Card>
         ))}
       </div>
@@ -146,7 +145,7 @@ export default function ShiftsPage() {
                 title="No shifts yet"
                 description="Create your first shift to start scheduling."
                 action={
-                  <Button variant="gradient" size="sm" onClick={() => setFormOpen(true)}>
+                  <Button size="sm" onClick={() => setFormOpen(true)}>
                     <Plus /> Create shift
                   </Button>
                 }
@@ -160,7 +159,7 @@ export default function ShiftsPage() {
                     <span className="mt-1 h-9 w-1.5 shrink-0 rounded-full" style={{ background: shift.color }} />
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
-                        <p className="font-display text-[15px] font-semibold">{shift.name}</p>
+                        <p className="text-[15px] font-semibold">{shift.name}</p>
                         <StatusBadge status={shift.status} />
                       </div>
                       <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">

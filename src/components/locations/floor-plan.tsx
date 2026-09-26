@@ -82,7 +82,7 @@ export function FloorPlan({ location, presence, selectedEmployeeId, onSelectEmpl
       })}
 
       {/* Legend */}
-      <div className="glass absolute bottom-2.5 left-2.5 flex items-center gap-3 rounded-lg border px-3 py-1.5 text-[10px] text-muted-foreground">
+      <div className="absolute bottom-2.5 left-2.5 flex items-center gap-3 rounded-lg border bg-card px-3 py-1.5 text-[10px] text-muted-foreground">
         <span className="flex items-center gap-1">
           <Radio className="h-3 w-3 text-success" /> {onSite.length} on site
         </span>

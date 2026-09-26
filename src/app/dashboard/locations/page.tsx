@@ -94,7 +94,6 @@ export default function LocationsPage() {
         description="Manage offices, geofences and live on-site presence from employee phones."
         actions={
           <Button
-            variant="gradient"
             onClick={() => {
               setEditTarget(null);
               setFormOpen(true);
@@ -117,7 +116,7 @@ export default function LocationsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs text-muted-foreground">{k.label}</p>
-                <p className="mt-1 font-display text-2xl font-bold tabular">
+                <p className="mt-1 text-2xl font-bold tabular">
                   {presenceLoading ? <span className="inline-block h-6 w-12 animate-pulse rounded bg-muted" /> : k.value}
                 </p>
               </div>

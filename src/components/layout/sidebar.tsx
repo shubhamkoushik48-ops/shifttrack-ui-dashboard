@@ -21,7 +21,7 @@ import { useLeaveRequests } from "@/hooks/use-queries";
 import { Button } from "@/components/ui/button";
 import { Avatar } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { APP_NAME } from "@/constants/Index";
+import { APP_NAME } from "@/constants/index";
 import type { LucideIcon } from "lucide-react";
 
 interface NavEntry {

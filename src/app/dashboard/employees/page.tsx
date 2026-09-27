@@ -21,7 +21,7 @@ import { DeactivateEmployeeDialog } from "@/components/employees/deactivate-empl
 import { useEmployees } from "@/hooks/use-queries";
 import { useUiStore } from "@/store/ui-store";
 import type { Employee } from "@/types";
-import { EMPLOYEE_STATUS_OPTIONS, DEPARTMENTS } from "@/constants/Index";
+import { EMPLOYEE_STATUS_OPTIONS, DEPARTMENTS } from "@/constants/index";
 import { toast } from "sonner";
 
 export default function EmployeesPage() {

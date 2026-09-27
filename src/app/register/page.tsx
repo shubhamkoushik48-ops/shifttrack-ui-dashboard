@@ -27,7 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { DEPARTMENTS } from "@/constants/Index";
+import { DEPARTMENTS } from "@/constants/index";
 import { authService } from "@/services";
 import { useAuthStore, useIsAuthenticated } from "@/store/auth-store";
 import { getApiErrorMessage } from "@/lib/api-client";

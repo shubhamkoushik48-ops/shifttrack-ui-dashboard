@@ -31,7 +31,7 @@ import { useLocations, useOverview, usePresence } from "@/hooks/use-queries";
 import { usePresenceStore } from "@/store/presence-store";
 import { useAuthStore } from "@/store/auth-store";
 import { cn, formatTime, formatDuration, pct } from "@/lib/utils";
-import { LEAVE_TYPE_LABELS } from "@/constants/Index";
+import { LEAVE_TYPE_LABELS } from "@/constants/index";
 
 const ACTIVITY_ICONS = {
   clock_in: Fingerprint,

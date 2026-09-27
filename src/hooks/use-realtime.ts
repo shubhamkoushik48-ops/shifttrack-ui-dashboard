@@ -7,7 +7,7 @@ import { realtime, asAttendance, asLeaveRequest, asPresence, asGeofenceEvent } f
 import { useAttendanceStore, useLeaveStore } from "@/store/domain-store";
 import { usePresenceStore } from "@/store/presence-store";
 import { useUiStore } from "@/store/ui-store";
-import { LEAVE_TYPE_LABELS } from "@/constants/Index";
+import { LEAVE_TYPE_LABELS } from "@/constants/index";
 
 /**
  * Global realtime binding:

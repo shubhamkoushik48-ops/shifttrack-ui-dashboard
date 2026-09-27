@@ -13,7 +13,7 @@ import { StatusBadge } from "@/components/dashboard/attendance-status-badge";
 import { useAttendance } from "@/hooks/use-queries";
 import { employeeService } from "@/services";
 import { formatDuration, formatTime } from "@/lib/utils";
-import { EMPLOYMENT_TYPE_LABELS } from "@/constants/Index";
+import { EMPLOYMENT_TYPE_LABELS } from "@/constants/index";
 import type { Employee } from "@/types";
 
 interface Props {

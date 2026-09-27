@@ -1,5 +1,5 @@
 import { makeRng, seedFrom } from "@/lib/rng";
-import { DEPARTMENTS, DESIGNATIONS, LOCATIONS } from "@/constants/Index";
+import { DEPARTMENTS, DESIGNATIONS, LOCATIONS } from "@/constants/index";
 import type { Employee, Shift, AttendanceRecord, LeaveRequest } from "@/types";
 
 // ── Name pools ──────────────────────────────────────────────────────────

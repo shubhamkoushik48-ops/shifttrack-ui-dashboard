@@ -23,7 +23,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { DEPARTMENTS, DESIGNATIONS, LOCATIONS, EMPLOYEE_STATUS_OPTIONS, EMPLOYMENT_TYPES } from "@/constants/Index";
+import { DEPARTMENTS, DESIGNATIONS, LOCATIONS, EMPLOYEE_STATUS_OPTIONS, EMPLOYMENT_TYPES } from "@/constants/index";
 import { useCreateEmployee, useUpdateEmployee } from "@/hooks/use-queries";
 import type { Employee } from "@/types";
 
